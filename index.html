@@ -60,7 +60,6 @@
   </div>
 
   <script>
-    // Conexão direta com o Supabase da Duda
     const SUPABASE_URL = "https://pfagquntwcfwjblezjro.supabase.co";
     const SUPABASE_KEY = "sb_publishable_Rkm1UZv7J13m8kVhcvrIpA_IP_wl7zu"; 
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
@@ -91,3 +90,83 @@
       }
 
       const containerGeral = document.getElementById("listaProdutos");
+      const containerEscolhidos = document.getElementById("listaEscolhidos");
+      const divSecaoEscolhidos = document.getElementById("secaoEscolhidos");
+      
+      containerGeral.innerHTML = "";
+      containerEscolhidos.innerHTML = "";
+      let temEscolhido = false;
+
+      produtos.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "card-presente";
+
+        const isReservado = p.reservado === true || p.reservado === 'TRUE' || p.reservado === 'true' || p.reservado_por;
+        
+        // Correção de compatibilidade para pegar o texto da descrição com caracteres especiais
+        const textoDescricaoRaw = p.descrição || p.descricao || p['descri\u00e7\u00e3o'] || '';
+        const dadosDescricao = separarTextoELink(textoDescricaoRaw);
+
+        let botaoLinkLoja = "";
+        if (dadosDescricao.link) {
+          botaoLinkLoja = `<a href="${dadosDescricao.link}" target="_blank" class="btn-link-loja">🔗 Ver Sugestão de Loja</a>`;
+        }
+
+        let acaoBotao = `<button class="btn-reservar" onclick="reservarItem(${p.id}, '${p.nome}')">Escolher Presente 🎁</button>`;
+        if (isReservado) {
+          acaoBotao = `<div class="status-reservado">💙 Reservado por ${p.reservado_por || 'Convidado'}</div>`;
+        }
+
+        const tagPreco = isReservado ? '' : `<div class="valor-presente">R$ ${Number(p.valor).toFixed(2).replace('.', ',')}</div>`;
+
+        card.innerHTML = `
+          <div>
+            <img src="${p.imagem || 'https://via.placeholder.com/150'}" alt="${p.nome}">
+            <div class="nome-presente">${p.nome}</div>
+            ${dadosDescricao.texto ? `<div class="descricao-presente">${dadosDescricao.texto}</div>` : ''}
+            ${botaoLinkLoja}
+            ${tagPreco}
+          </div>
+          ${acaoBotao}
+        `;
+
+        if (isReservado) {
+          containerEscolhidos.appendChild(card);
+          temEscolhido = true;
+        } else {
+          containerGeral.appendChild(card);
+        }
+      });
+
+      if (temEscolhido) {
+        divSecaoEscolhidos.style.display = "block";
+      } else {
+        divSecaoEscolhidos.style.display = "none";
+      }
+    }
+
+    async function reservarItem(idItem, nomeItem) {
+      const nomeConvidado = prompt(`Você escolheu: ${nomeItem}\n\nPor favor, digite o seu nome para sabermos quem enviou:`);
+      if (!nomeConvidado || nomeConvidado.trim() === "") {
+        alert("A escolha não foi concluída. É necessário informar o seu nome.");
+        return;
+      }
+
+      const { error } = await _supabase
+        .from('presentes')
+        .update({ reservado: 'TRUE', reservado_por: nomeConvidado.trim() })
+        .eq('id', idItem);
+
+      if (error) {
+        alert("Houve um erro ao reservar o presente. Tente novamente.");
+        console.error(error);
+      } else {
+        alert("Presente escolhido com sucesso! Muito obrigada pelo carinho. 💙✨");
+        carregarPresentes();
+      }
+    }
+
+    carregarPresentes();
+  </script>
+</body>
+</html>
