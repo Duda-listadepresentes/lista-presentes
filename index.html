@@ -11,33 +11,44 @@
     h1 { margin: 0; font-size: 28px; font-family: 'Georgia', serif; }
     header p { margin: 15px 0 0 0; font-size: 16px; opacity: 0.95; line-height: 1.5; }
     
+    /* Seção horizontal para os itens já escolhidos */
     .secao-escolhidos { max-width: 1200px; margin: 0 auto 40px auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(43, 58, 74, 0.05); border: 1px solid #b0cfe0; }
     .titulo-escolhidos { font-size: 18px; font-family: 'Georgia', serif; color: #3a7ca5; margin: 0 0 15px 0; text-align: left; font-weight: bold; }
     
-    .carrossel-escolhidos { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; scroll-behavior: smooth; }
+    /* Configuração do Carrossel em Miniatura para Celular */
+    .carrossel-escolhidos { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
     .carrossel-escolhidos::-webkit-scrollbar { height: 6px; }
     .carrossel-escolhidos::-webkit-scrollbar-thumb { background: #b0cfe0; border-radius: 4px; }
     
+    /* Tamanho miniatura dos cards no carrossel */
     .carrossel-escolhidos .card-presente { min-width: 180px; max-width: 180px; padding: 12px; }
     .carrossel-escolhidos .card-presente img { height: 100px; margin-bottom: 8px; }
-    
+    .carrossel-escolhidos .nome-presente { font-size: 14px; margin: 5px 0; }
+    .carrossel-escolhidos .status-reservado { font-size: 12px; padding: 8px; }
+    .carrossel-escolhidos .btn-link-loja { font-size: 11px; padding: 5px; }
+
+    /* Grade vertical dos disponíveis */
     .grid-presentes { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
     .card-presente { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(43, 58, 74, 0.05); text-align: center; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #e1ecf4; }
     .card-presente img { max-width: 100%; height: 180px; object-fit: contain; border-radius: 5px; margin-bottom: 15px; }
     .nome-presente { font-size: 18px; font-weight: bold; color: #2b3a4a; margin: 10px 0; }
-    .descricao-presente { font-size: 14px; color: #5a6e85; margin-bottom: 10px; line-height: 1.4; min-height: 45px; }
+    .descricao-presente { font-size: 14px; color: #5a6e85; margin-bottom: 10px; line-height: 1.4; min-height: 45px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .valor-presente { font-size: 20px; color: #2a6f97; font-weight: bold; margin: 15px 0; }
     
-    .btn-link-loja { background: #f2f7fb; color: #3a7ca5; border: 1px solid #b0cfe0; padding: 8px; width: 100%; border-radius: 5px; font-size: 13px; text-decoration: none; display: inline-block; margin-bottom: 10px; box-sizing: border-box; }
-    .btn-reservar { background: #3a7ca5; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 15px; }
-    .status-reservado { color: #5a6e85; font-weight: bold; padding: 12px; background: #e1ecf4; border-radius: 5px; margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 5px; }
+    .btn-link-loja { background: #f2f7fb; color: #3a7ca5; border: 1px solid #b0cfe0; padding: 8px; width: 100%; border-radius: 5px; font-weight: normal; font-size: 13px; cursor: pointer; text-decoration: none; display: inline-block; margin-bottom: 10px; box-sizing: border-box; transition: all 0.3s; }
+    .btn-link-loja:hover { background: #e1ecf4; color: #1a4f70; border-color: #3a7ca5; }
+    .btn-reservar { background: #3a7ca5; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; transition: background 0.3s; box-sizing: border-box; font-size: 15px; }
+    .btn-reservar:hover { background: #2a6f97; }
+    .status-reservado { color: #5a6e85; font-weight: bold; padding: 12px; background: #e1ecf4; border-radius: 5px; margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 15px; }
   </style>
 </head>
 <body>
 
   <header>
     <h1>🎩 Meus 15 Anos - Duda no País das Maravilhas 🐇</h1>
-    <p>Preparei esta lista para ajudar quem quiser me presentear. Escolha o item que preferir!</p>
+    <p><strong>"A única forma de alcançar o impossível é acreditar que é possível."</strong></p>
+    <p>Preparei esta lista para ajudar quem quiser me presentear. Escolha o item que preferir e compre onde achar melhor!</p>
+    <p>Ao selecionar um presente, ele ficará reservado exclusivamente no seu nome para que não haja repetições. 🥰</p>
   </header>
 
   <div class="secao-escolhidos" id="secaoEscolhidos" style="display: none;">
@@ -50,11 +61,11 @@
   </div>
 
   <script>
-    // 1. URL CORRIGIDA COM .supabase.co
     const SUPABASE_URL = "https://pfagquntwcfwjblezjro.supabase.co";
     const SUPABASE_KEY = "sb_publishable_Rkm1UZv7J13m8kVhcvrIpA_IP_wl7zu"; 
     let _supabase;
 
+    // Aguarda o navegador carregar o script do Supabase antes de iniciar a conexão
     document.addEventListener("DOMContentLoaded", () => {
       if (typeof supabase !== "undefined") {
         _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -79,98 +90,4 @@
     async function carregarPresentes() {
       if (!_supabase) return;
       
-      const { data: produtos, error } = await _supabase
-        .from('presentes')
-        .select('*')
-        .order('nome', { ascending: true });
-
-      if (error) {
-        console.error("Erro Supabase:", error);
-        document.getElementById("listaProdutos").innerHTML = `<p style='color:red;'>Erro ao carregar banco: ${error.message}</p>`;
-        return;
-      }
-
-      const containerGeral = document.getElementById("listaProdutos");
-      const containerEscolhidos = document.getElementById("listaEscolhidos");
-      const divSecaoEscolhidos = document.getElementById("secaoEscolhidos");
-      
-      containerGeral.innerHTML = "";
-      containerEscolhidos.innerHTML = "";
-      let temEscolhido = false;
-
-      if (!produtos || produtos.length === 0) {
-        containerGeral.innerHTML = "<p>Nenhum presente disponível no momento.</p>";
-        return;
-      }
-
-      produtos.forEach(p => {
-        const card = document.createElement("div");
-        card.className = "card-presente";
-
-        // Ajuste 6: Tratamento de booleano puro ou string vinda do banco
-        const isReservado = p.reservado === true || p.reservado === 'TRUE' || p.reservado === 'true' || !!p.reservado_por;
-        
-        // Ajuste 5: Mapeamento de caractere especial 'descrição'
-        const textoDescricaoRaw = p.descrição || p.descricao || p['descri\u00e7\u00e3o'] || '';
-        const dadosDescricao = separarTextoELink(textoDescricaoRaw);
-
-        let botaoLinkLoja = "";
-        if (dadosDescricao.link) {
-          botaoLinkLoja = `<a href="${dadosDescricao.link}" target="_blank" class="btn-link-loja">🔗 Ver Sugestão de Loja</a>`;
-        }
-
-        let acaoBotao = `<button class="btn-reservar" onclick="reservarItem(${p.id}, '${p.nome}')">Escolher Presente 🎁</button>`;
-        if (isReservado) {
-          acaoBotao = `<div class="status-reservado">💙 Reservado por ${p.reservado_por || 'Convidado'}</div>`;
-        }
-
-        const tagPreco = isReservado ? '' : `<div class="valor-presente">R$ ${Number(p.valor).toFixed(2).replace('.', ',')}</div>`;
-
-        card.innerHTML = `
-          <div>
-            <img src="${p.imagem || 'https://via.placeholder.com/150'}" alt="${p.nome}">
-            <div class="nome-presente">${p.nome}</div>
-            ${dadosDescricao.texto ? `<div class="descricao-presente">${dadosDescricao.texto}</div>` : ''}
-            ${botaoLinkLoja}
-            ${tagPreco}
-          </div>
-          ${acaoBotao}
-        `;
-
-        if (isReservado) {
-          containerEscolhidos.appendChild(card);
-          temEscolhido = true;
-        } else {
-          containerGeral.appendChild(card);
-        }
-      });
-
-      divSecaoEscolhidos.style.display = temEscolhido ? "block" : "none";
-    }
-
-    async function reservarItem(idItem, nomeItem) {
-      if (!_supabase) return;
-
-      const nomeConvidado = prompt(`Você escolheu: ${nomeItem}\n\nPor favor, digite o seu nome para sabermos quem enviou:`);
-      if (!nomeConvidado || nomeConvidado.trim() === "") {
-        alert("A escolha não foi concluída. É necessário informar o seu nome.");
-        return;
-      }
-
-      // Ajuste 6: Gravando booleano puro (true) no banco de dados
-      const { error } = await _supabase
-        .from('presentes')
-        .update({ reservado: true, reservado_por: nomeConvidado.trim() })
-        .eq('id', idItem);
-
-      if (error) {
-        alert("Houve um erro ao reservar. Verifique se as políticas RLS permitem gravação.");
-        console.error(error);
-      } else {
-        alert("Presente escolhido com sucesso! Muito obrigada pelo carinho. 💙✨");
-        carregarPresentes();
-      }
-    }
-  </script>
-</body>
-</html>
+      // Busca os itens do banco e ordena exatamente pela ordem de cadastro (ID
