@@ -36,14 +36,15 @@
 <body>
 
   <header>
-    <h1>🎩 Meus 15 Anos - Duda no País das Maravilhas 🐇</h1>
+    <h1>me obedeça.</h1>
+    <p>🎩 Meus 15 Anos - Duda no País das Maravilhas 🐇</p>
     <p>Oii! Que bom ter você aqui. 💖</p>
-    <p>Fiz uma lista de sugestões de presentes que são a minha cara. Clique em "Escolher 🎁" para reservar um presente exclusivamente seu, e compre onde quiser. Lembrando que deixei a sugestão de loja em cada item.</p>
+    <p>Fiz uma lista de sugestões de presentes que são a minha cara. Clique em "Escolher este🎁" para reservar um presente exclusivamente seu, e compre onde quiser. Lembrando que deixei a sugestão de loja em cada item.</p>
     <p>Ahhh, preciso te dizer que, assim que você escolher, o produto ficará indisponível para outro convidado! 🥰</p>
   </header>
 
   <div class="secao-escolhidos" id="secaoEscolhidos" style="display: none;">
-    <div class="titulo-escolhidos">✨ Presentes Já Escolhidos (Não perca a hora!) ⏰</div>
+    <div class="titulo-escolhidos">✨ Presentes Já Escolhidos ⏰</div>
     <div class="carrossel-escolhidos" id="listaEscolhidos"></div>
   </div>
 
@@ -52,7 +53,6 @@
   </div>
 
   <script>
-    // 1. URL CORRIGIDA COM .supabase.co
     const SUPABASE_URL = "https://pfagquntwcfwjblezjro.supabase.co";
     const SUPABASE_KEY = "sb_publishable_Rkm1UZv7J13m8kVhcvrIpA_IP_wl7zu"; 
     let _supabase;
@@ -84,7 +84,7 @@
       const { data: produtos, error } = await _supabase
         .from('presentes')
         .select('*')
-        .order('id', { ascending: true }); // Ordenando por ID para respeitar a ordem de cadastro
+        .order('id', { ascending: true });
 
       if (error) {
         console.error("Erro Supabase:", error);
@@ -109,10 +109,8 @@
         const card = document.createElement("div");
         card.className = "card-presente";
 
-        // Ajuste 6: Tratamento de booleano puro ou string vinda do banco
         const isReservado = p.reservado === true || p.reservado === 'TRUE' || p.reservado === 'true' || !!p.reservado_por;
         
-        // Ajuste 5: Mapeamento de caractere especial 'descrição'
         const textoDescricaoRaw = p.descrição || p.descricao || p['descri\u00e7\u00e3o'] || '';
         const dadosDescricao = separarTextoELink(textoDescricaoRaw);
 
@@ -121,7 +119,7 @@
           botaoLinkLoja = `<a href="${dadosDescricao.link}" target="_blank" class="btn-link-loja">🔗 Ver Sugestão de Loja</a>`;
         }
 
-        let acaoBotao = `<button class="btn-reservar" onclick="reservarItem(${p.id}, '${p.nome}')">Escolher Presente 🎁</button>`;
+        let acaoBotao = `<button class="btn-reservar" onclick="reservarItem(${p.id}, '${p.nome}')">Escolher este🎁</button>`;
         if (isReservado) {
           acaoBotao = `<div class="status-reservado">💙 Reservado por ${p.reservado_por || 'Convidado'}</div>`;
         }
@@ -153,13 +151,12 @@
     async function reservarItem(idItem, nomeItem) {
       if (!_supabase) return;
 
-      const nomeConvidado = prompt(`Você escolheu: ${nomeItem}\n\nPor favor, digite o seu nome para sabermos quem enviou:`);
+      const nomeConvidado = prompt("por favor, digite seu nome e compre onde preferir.");
       if (!nomeConvidado || nomeConvidado.trim() === "") {
         alert("A escolha não foi concluída. É necessário informar o seu nome.");
         return;
       }
 
-      // Ajuste 6: Gravando booleano puro (true) no banco de dados
       const { error } = await _supabase
         .from('presentes')
         .update({ reservado: true, reservado_por: nomeConvidado.trim() })
