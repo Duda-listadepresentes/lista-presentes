@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de Controle - Lista da Duda</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f2f7fb; margin: 0; padding: 20px; color: #2b3a4a; }
+    header { background: #1a4f70; color: white; padding: 20px; text-align: center; border-radius: 10px; margin-bottom: 30px; }
+    h1 { margin: 0; font-size: 24px; font-family: 'Georgia', serif; }
+    
+    .container { max-width: 1000px; margin: 0 auto; }
+    .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(43, 58, 74, 0.05); margin-bottom: 25px; border: 1px solid #e1ecf4; }
+    h2 { color: #3a7ca5; margin-top: 0; border-bottom: 2px solid #e1ecf4; padding-bottom: 10px; }
+    
+    /* Formulário */
+    .form-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+    @media (max-width: 600px) { .form-group { grid-template-columns: 1fr; } }
+    label { font-weight: bold; font-size: 14px; margin-bottom: 5px; display: block; }
+    input, textarea { width: 100%; padding: 10px; border: 1px solid #b0cfe0; border-radius: 5px; box-sizing: border-box; }
+    button { background: #3a7ca5; color: white; border: none; padding: 12px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+    button:hover { background: #2a6f97; }
+    
+    /* Tabela de Monitoramento */
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e1ecf4; }
+    th { background-color: #f2f7fb; color: #3a7ca5; }
+    .btn-excluir { background: #d9534f; padding: 6px 12px; font-size: 13px; }
+    .btn-excluir:hover { background: #c9302c; }
+    .btn-liberar { background: #f0ad4e; padding: 6px 12px; font-size: 13px; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; cursor: pointer; border: none;}
+    .btn-liberar:hover { background: #ec971f; }
+    .img-preview { width: 50px; height: 50px; object-fit: contain; border-radius: 5px; }
+    .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+    .status-disponivel { background: #dff0d8; color: #3c763d; }
+    .status-reservado { background: #d9edf7; color: #31708f; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🔑 Painel de Controle da Duda e da Mamãe 👑</h1>
+    <p>Gerencie os presentes e monitore quem já escolheu!</p>
+  </header>
+
+  <div class="container">
+    
+    <div class="card">
+      <h2>🎁 Adicionar Novo Presente à Lista</h2>
+      <form id="formAdicionar" onsubmit="adicionarPresente(event)">
+        <div class="form-group">
+          <div>
+            <label>Nome do Presente *</label>
+            <input type="text" id="nome" required placeholder="Ex: Livro Alice no País das Maravilhas">
+          </div>
+          <div>
+            <label>Valor (R$) *</label>
+            <input type="number" step="0.01" id="valor" required placeholder="Ex: 59.90">
+          </div>
+        </div>
+        <div class="form-group">
+          <div>
+            <label>Link da Imagem (URL)</label>
+            <input type="url" id="imagem" placeholder="https://exemplo.com/foto.jpg">
+          </div>
+          <div>
+            <label>Link de Sugestão de Loja (Cole dentro da Descrição se houver)</label>
+            <input type="url" id="linkLoja" placeholder="https://amazon.com.br/item">
+          </div>
+        </div>
+        <div style="margin-bottom: 15px;">
+          <label>Descrição do Presente</label>
+          <textarea id="descricao" rows="2" placeholder="Algum detalhe extra, tamanho, cor, etc."></textarea>
+        </div>
+        <button type="submit">Cadastrar Presente ✨</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>📊 Lista de Presentes & Monitoramento de Reservas</h2>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Foto</th>
+              <th>Presente</th>
+              <th>Valor</th>
+              <th>Status</th>
+              <th>Quem Escolheu?</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaPresentes">
+            <tr>
+              <td colspan="6" style="text-align: center;">Carregando presentes...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Conexão direta com o Supabase da Duda
+    const SUPABASE_URL = "https://pfagquntwcfwjblezjro.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_Rkm1UZv7J13m8kVhcvrIpA_IP_wl7zu"; 
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      global: { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+    });
+
+    async function carregarTabela() {
+      const { data: produtos, error } = await _supabase
+        .from('presentes')
+        .select('*')
+        .order('nome', { ascending: true });
+
+      if (error) {
+        console.error("Erro ao carregar:", error);
+        return;
+      }
+
+      const tbody = document.getElementById("tabelaPresentes");
+      tbody.innerHTML = "";
+
+      if (produtos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Nenhum presente cadastrado ainda.</td></tr>`;
+        return;
+      }
+
+      produtos.forEach(p => {
+        const isReservado = p.reservado === true || p.reservado === 'TRUE' || p.reservado_por;
+        const statusHTML = isReservado 
+          ? `<span class="status-badge status-reservado">💙 Reservado</span>` 
+          : `<span class="status-badge status-disponivel">💚 Disponível</span>`;
+
+        const btnAcao = isReservado
+          ? `<button class="btn-liberar" onclick="liberarItem(${p.id}, '${p.nome}')">Liberar Presente</button>`
+          : `<button class="btn-excluir" onclick="excluirItem(${p.id}, '${p.nome}')">Excluir</button>`;
+
+        tbody.innerHTML += `
+          <tr>
+            <td><img class="img-preview" src="${p.imagem || 'https://via.placeholder.com/50'}" alt="${p.nome}"></td>
+            <td><strong>${p.nome}</strong></td>
+            <td>R$ ${Number(p.valor).toFixed(2).replace('.', ',')}</td>
+            <td>${statusHTML}</td>
+            <td><strong>${p.reservado_por || '-'}</strong></td>
+            <td>
+              ${btnAcao}
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    async function adicionarPresente(e) {
+      e.preventDefault();
+      const nome = document.getElementById("nome").value;
+      const valor = parseFloat(document.getElementById("valor").value);
+      const imagem = document.getElementById("imagem").value || 'https://via.placeholder.com/150';
+      const linkLoja = document.getElementById("linkLoja").value;
+      let descricao = document.getElementById("descricao").value;
+
+      // Junta o link da loja na descrição caso exista, para o site principal ler certinho
+      if (linkLoja) {
+        descricao = `${descricao} ${linkLoja}`.trim();
+      }
+
+      const { error } = await _supabase
+        .from('presentes')
+        .insert([{ nome, valor, imagem, descrição: descricao, reservado: 'FALSE', reservado_por: '' }]);
+
+      if (error) {
+        alert("Erro ao adicionar o presente.");
+        console.error(error);
+      } else {
+        alert("Presente adicionado com sucesso!");
+        document.getElementById("formAdicionar").reset();
+        carregarTabela();
+      }
+    }
+
+    async function liberarItem(id, nome) {
+      if (confirm(`Tem certeza que quer liberar o presente "${nome}"? Ele voltará a ficar disponível para todos.`)) {
+        const { error } = await _supabase
+          .from('presentes')
+          .update({ reservado: 'FALSE', reservado_por: '' })
+          .eq('id', id);
+
+        if (error) {
+          alert("Erro ao liberar item.");
+        } else {
+          carregarTabela();
+        }
+      }
+    }
+
+    async function excluirItem(id, nome) {
+      if (confirm(`Tem certeza que deseja apagar permanentemente o presente "${nome}" do site?`)) {
+        const { error } = await _supabase
+          .from('presentes')
+          .delete()
+          .eq('id', id);
+
+        if (error) {
+          alert("Erro ao excluir item.");
+        } else {
+          carregarTabela();
+        }
+      }
+    }
+
+    carregarTabela();
+  </script>
+</body>
+</html>
