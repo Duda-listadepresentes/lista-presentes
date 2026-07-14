@@ -35,11 +35,11 @@
 </head>
 <body>
 
-<header>
+  <header>
     <h1>🎩 Meus 15 Anos - Duda no País das Maravilhas 🐇</h1>
-    <p>Oii! Que bom ter você no meu País das Maravilhas! 💖</p>
-    <p>Montei essa lista com algumas sugestões de presentes que são a minha cara. Clicando no item, você já vê uma sugestão de loja bem legal para te ajudar!</p>
-    <p>⏰ <strong>Só um recado rápido do Coelho Branco para você não perder a hora:</strong> Quando você selecionar o seu presente e colocar seu nome, ele fica bloqueado para os outros convidados. Assim, eu garanto um presente único e super exclusivo seu! 🎁✨</p>
+    <p>Oii! Que bom ter você aqui. 💖</p>
+    <p>Fiz uma lista de sugestões de presentes que são a minha cara. Clique em <strong>"Escolher Presente 🎁"</strong> para reservar um presente exclusivamente seu, e compre onde quiser. Lembrando que deixei a sugestão de loja em cada item.</p>
+    <p>Ahhh, preciso te dizer que, assim que você escolher, o produto ficará indisponível para outro convidado! 🥰</p>
   </header>
 
   <div class="secao-escolhidos" id="secaoEscolhidos" style="display: none;">
@@ -84,7 +84,7 @@
       const { data: produtos, error } = await _supabase
         .from('presentes')
         .select('*')
-        .order('id', { ascending: true }); // Linha alterada: agora ordena por ID (ordem de cadastro)
+        .order('id', { ascending: true }); // Ordenando por ID para respeitar a ordem de cadastro
 
       if (error) {
         console.error("Erro Supabase:", error);
