@@ -51,6 +51,7 @@
   </div>
 
   <script>
+    // 1. URL CORRIGIDA COM .supabase.co
     const SUPABASE_URL = "https://pfagquntwcfwjblezjro.supabase.co";
     const SUPABASE_KEY = "sb_publishable_Rkm1UZv7J13m8kVhcvrIpA_IP_wl7zu"; 
     let _supabase;
@@ -60,4 +61,68 @@
         _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         carregarPresentes();
       } else {
-        document.getElementById("listaProdutos
+        document.getElementById("listaProdutos").innerHTML = "<p style='color:red;'>Erro ao carregar a biblioteca de conexão.</p>";
+      }
+    });
+
+    function separarTextoELink(textoCompleto) {
+      if (!textoCompleto) return { texto: "", link: "" };
+      const regexLink = /(https?:\/\/[^\s]+)/g;
+      const linksEncontrados = textoCompleto.match(regexLink);
+      if (linksEncontrados && linksEncontrados.length > 0) {
+        const linkExtraido = linksEncontrados[0];
+        const textoLimpo = textoCompleto.replace(linkExtraido, "").trim();
+        return { texto: textoLimpo, link: linkExtraido };
+      }
+      return { texto: textoCompleto, link: "" };
+    }
+
+    async function carregarPresentes() {
+      if (!_supabase) return;
+      
+      const { data: produtos, error } = await _supabase
+        .from('presentes')
+        .select('*')
+        .order('id', { ascending: true });
+
+      if (error) {
+        console.error("Erro Supabase:", error);
+        document.getElementById("listaProdutos").innerHTML = `<p style='color:red;'>Erro ao carregar banco: ${error.message}</p>`;
+        return;
+      }
+
+      const containerGeral = document.getElementById("listaProdutos");
+      const containerEscolhidos = document.getElementById("listaEscolhidos");
+      const divSecaoEscolhidos = document.getElementById("secaoEscolhidos");
+      
+      containerGeral.innerHTML = "";
+      containerEscolhidos.innerHTML = "";
+      let temEscolhido = false;
+
+      if (!produtos || produtos.length === 0) {
+        containerGeral.innerHTML = "<p>Nenhum presente disponível no momento.</p>";
+        return;
+      }
+
+      produtos.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "card-presente";
+
+        // Ajuste 6: Tratamento de booleano puro ou string vinda do banco
+        const isReservado = p.reservado === true || p.reservado === 'TRUE' || p.reservado === 'true' || !!p.reservado_por;
+        
+        // Ajuste 5: Mapeamento de caractere especial 'descrição'
+        const textoDescricaoRaw = p.descrição || p.descricao || p['descri\u00e7\u00e3o'] || '';
+        const dadosDescricao = separarTextoELink(textoDescricaoRaw);
+
+        let botaoLinkLoja = "";
+        if (dadosDescricao.link) {
+          botaoLinkLoja = `<a href="${dadosDescricao.link}" target="_blank" class="btn-link-loja">🔗 Ver Sugestão de Loja</a>`;
+        }
+
+        let acaoBotao = `<button class="btn-reservar" onclick="reservarItem(${p.id}, '${p.nome}')">Escolher Presente 🎁</button>`;
+        if (isReservado) {
+          acaoBotao = `<div class="status-reservado">💙 Reservado por ${p.reservado_por || 'Convidado'}</div>`;
+        }
+
+        const tagPreco = isReservado ? '' : `<div class="valor-presente">R$ ${Number(p.valor).toFixed(2).
