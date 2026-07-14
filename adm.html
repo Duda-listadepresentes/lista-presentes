@@ -3,176 +3,135 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meus 15 Anos - Duda</title>
+  <title>Painel de Controle - Lista da Duda</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body { font-family: Arial, sans-serif; background: #f2f7fb; margin: 0; padding: 20px; color: #2b3a4a; }
-    header { background: #3a7ca5; color: white; padding: 40px 20px; text-align: center; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 4px 10px rgba(58, 124, 165, 0.15); border-bottom: 4px solid #ffd700; }
-    h1 { margin: 0; font-size: 28px; font-family: 'Georgia', serif; }
-    header p { margin: 15px 0 0 0; font-size: 16px; opacity: 0.95; line-height: 1.5; }
+    header { background: #1a4f70; color: white; padding: 20px; text-align: center; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 4px 10px rgba(58, 124, 165, 0.15); border-bottom: 4px solid #ffd700; }
+    h1 { margin: 0; font-size: 24px; font-family: 'Georgia', serif; }
+    header p { margin: 10px 0 0 0; font-size: 14px; opacity: 0.9; }
     
-    .secao-escolhidos { max-width: 1200px; margin: 0 auto 40px auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(43, 58, 74, 0.05); border: 1px solid #b0cfe0; }
-    .titulo-escolhidos { font-size: 18px; font-family: 'Georgia', serif; color: #3a7ca5; margin: 0 0 15px 0; text-align: left; font-weight: bold; }
+    .container { max-width: 800px; margin: 0 auto; }
     
-    .carrossel-escolhidos { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; scroll-behavior: smooth; }
-    .carrossel-escolhidos::-webkit-scrollbar { height: 6px; }
-    .carrossel-escolhidos::-webkit-scrollbar-thumb { background: #b0cfe0; border-radius: 4px; }
+    .titulo-secao { text-align: center; color: #1a4f70; font-family: 'Georgia', serif; font-size: 22px; font-weight: bold; margin-bottom: 20px; }
     
-    .carrossel-escolhidos .card-presente { min-width: 180px; max-width: 180px; padding: 12px; }
-    .carrossel-escolhidos .card-presente img { height: 100px; margin-bottom: 8px; }
+    /* Estilização idêntica ao modelo da foto, mas em Azul */
+    .tabela-container { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 4px 12px rgba(43, 58, 74, 0.05); border: 1px solid #b0cfe0; }
     
-    .grid-presentes { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
-    .card-presente { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(43, 58, 74, 0.05); text-align: center; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #e1ecf4; }
-    .card-presente img { max-width: 100%; height: 180px; object-fit: contain; border-radius: 5px; margin-bottom: 15px; }
-    .nome-presente { font-size: 18px; font-weight: bold; color: #2b3a4a; margin: 10px 0; }
-    .descricao-presente { font-size: 14px; color: #5a6e85; margin-bottom: 10px; line-height: 1.4; min-height: 45px; }
-    .valor-presente { font-size: 20px; color: #2a6f97; font-weight: bold; margin: 15px 0; }
+    table { width: 100%; border-collapse: collapse; background: white; border: 1px solid #b0cfe0; }
+    th, td { padding: 12px; text-align: left; border: 1px solid #b0cfe0; }
     
-    .btn-link-loja { background: #f2f7fb; color: #3a7ca5; border: 1px solid #b0cfe0; padding: 8px; width: 100%; border-radius: 5px; font-size: 13px; text-decoration: none; display: inline-block; margin-bottom: 10px; box-sizing: border-box; }
-    .btn-reservar { background: #3a7ca5; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 15px; }
-    .status-reservado { color: #5a6e85; font-weight: bold; padding: 12px; background: #e1ecf4; border-radius: 5px; margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 5px; }
+    th { background-color: #3a7ca5; color: white; font-weight: bold; text-align: center; font-size: 15px; }
+    
+    /* Centraliza os números e destaca as fontes */
+    td.col-numero { text-align: center; font-weight: bold; color: #3a7ca5; width: 60px; font-size: 16px; background-color: #fcfdfe; }
+    td.col-presente { font-size: 15px; color: #2b3a4a; }
+    td.col-escolheu { font-size: 15px; color: #2b3a4a; display: flex; align-items: center; gap: 8px; border: none; }
+    
+    /* Ajuste para a coluna de ação ficar limpa */
+    td.col-acao { text-align: center; width: 100px; }
+    
+    .btn-liberar { background: #f0ad4e; color: white; padding: 6px 12px; font-size: 13px; border-radius: 5px; font-weight: bold; cursor: pointer; border: none; transition: background 0.2s; }
+    .btn-liberar:hover { background: #ec971f; }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>🎩 Meus 15 Anos - Duda no País das Maravilhas 🐇</h1>
-    <p>Oii! Que bom ter você aqui. 💖</p>
-    <p>Fiz uma lista de sugestões de presentes que são a minha cara. Clique em "Escolher 🎁" para reservar um presente exclusivamente seu, e compre onde quiser. Lembrando que deixei a sugestão de loja em cada item.</p>
-    <p>Ahhh, preciso te dizer que, assim que você escolher, o produto ficará indisponível para outro convidado! 🥰</p>
+    <h1>🔑 Painel de Controle da Duda e da Mamãe 👑</h1>
+    <p>Acompanhe quem escolheu cada presente!</p>
   </header>
 
-  <div class="secao-escolhidos" id="secaoEscolhidos" style="display: none;">
-    <div class="titulo-escolhidos">✨ Presentes Já Escolhidos (Não perca a hora!) ⏰</div>
-    <div class="carrossel-escolhidos" id="listaEscolhidos"></div>
-  </div>
+  <div class="container">
+    
+    <div class="titulo-secao">Presentes Reservados</div>
+    
+    <div class="tabela-container">
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Nº</th>
+              <th>Presente</th>
+              <th>Quem escolheu</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaPresentes">
+            <tr>
+              <td colspan="4" style="text-align: center; padding: 20px;">Carregando escolhas...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-  <div class="grid-presentes" id="listaProdutos">
-    <p style="text-align: center; grid-column: 1/-1;">Carregando a lista de presentes...</p>
   </div>
 
   <script>
-    // 1. URL CORRIGIDA COM .supabase.co
     const SUPABASE_URL = "https://pfagquntwcfwjblezjro.supabase.co";
     const SUPABASE_KEY = "sb_publishable_Rkm1UZv7J13m8kVhcvrIpA_IP_wl7zu"; 
-    let _supabase;
-
-    document.addEventListener("DOMContentLoaded", () => {
-      if (typeof supabase !== "undefined") {
-        _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        carregarPresentes();
-      } else {
-        document.getElementById("listaProdutos").innerHTML = "<p style='color:red;'>Erro ao carregar a biblioteca de conexão.</p>";
-      }
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      global: { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
     });
 
-    function separarTextoELink(textoCompleto) {
-      if (!textoCompleto) return { texto: "", link: "" };
-      const regexLink = /(https?:\/\/[^\s]+)/g;
-      const linksEncontrados = textoCompleto.match(regexLink);
-      if (linksEncontrados && linksEncontrados.length > 0) {
-        const linkExtraido = linksEncontrados[0];
-        const textoLimpo = textoCompleto.replace(linkExtraido, "").trim();
-        return { texto: textoLimpo, link: linkExtraido };
-      }
-      return { texto: textoCompleto, link: "" };
-    }
-
-    async function carregarPresentes() {
-      if (!_supabase) return;
-      
+    async function carregarTabela() {
+      // Busca apenas os presentes reservados
       const { data: produtos, error } = await _supabase
         .from('presentes')
         .select('*')
-        .order('id', { ascending: true }); // Ordenando por ID para respeitar a ordem de cadastro
+        .or('reservado.eq.true,reservado.eq.TRUE,reservado_por.neq.""')
+        .order('id', { ascending: true });
 
       if (error) {
-        console.error("Erro Supabase:", error);
-        document.getElementById("listaProdutos").innerHTML = `<p style='color:red;'>Erro ao carregar banco: ${error.message}</p>`;
+        console.error("Erro ao carregar:", error);
         return;
       }
 
-      const containerGeral = document.getElementById("listaProdutos");
-      const containerEscolhidos = document.getElementById("listaEscolhidos");
-      const divSecaoEscolhidos = document.getElementById("secaoEscolhidos");
-      
-      containerGeral.innerHTML = "";
-      containerEscolhidos.innerHTML = "";
-      let temEscolhido = false;
+      const tbody = document.getElementById("tabelaPresentes");
+      tbody.innerHTML = "";
 
       if (!produtos || produtos.length === 0) {
-        containerGeral.innerHTML = "<p>Nenhum presente disponível no momento.</p>";
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 20px; color: #5a6e85;">Nenhum presente reservado até o momento.</td></tr>`;
         return;
       }
 
+      let contador = 1;
       produtos.forEach(p => {
-        const card = document.createElement("div");
-        card.className = "card-presente";
-
-        // Ajuste 6: Tratamento de booleano puro ou string vinda do banco
-        const isReservado = p.reservado === true || p.reservado === 'TRUE' || p.reservado === 'true' || !!p.reservado_por;
+        const nomeConvidado = p.reservado_por ? p.reservado_por.trim() : "Convidado";
         
-        // Ajuste 5: Mapeamento de caractere especial 'descrição'
-        const textoDescricaoRaw = p.descrição || p.descricao || p['descri\u00e7\u00e3o'] || '';
-        const dadosDescricao = separarTextoELink(textoDescricaoRaw);
-
-        let botaoLinkLoja = "";
-        if (dadosDescricao.link) {
-          botaoLinkLoja = `<a href="${dadosDescricao.link}" target="_blank" class="btn-link-loja">🔗 Ver Sugestão de Loja</a>`;
-        }
-
-        let acaoBotao = `<button class="btn-reservar" onclick="reservarItem(${p.id}, '${p.nome}')">Escolher Presente 🎁</button>`;
-        if (isReservado) {
-          acaoBotao = `<div class="status-reservado">💙 Reservado por ${p.reservado_por || 'Convidado'}</div>`;
-        }
-
-        const tagPreco = isReservado ? '' : `<div class="valor-presente">R$ ${Number(p.valor).toFixed(2).replace('.', ',')}</div>`;
-
-        card.innerHTML = `
-          <div>
-            <img src="${p.imagem || 'https://via.placeholder.com/150'}" alt="${p.nome}">
-            <div class="nome-presente">${p.nome}</div>
-            ${dadosDescricao.texto ? `<div class="descricao-presente">${dadosDescricao.texto}</div>` : ''}
-            ${botaoLinkLoja}
-            ${tagPreco}
-          </div>
-          ${acaoBotao}
+        tbody.innerHTML += `
+          <tr>
+            <td class="col-numero">${contador}</td>
+            <td class="col-presente">${p.nome}</td>
+            <td>
+              <div class="col-col-escolheu">🎁 ${nomeConvidado}</div>
+            </td>
+            <td class="col-acao">
+              <button class="btn-liberar" onclick="liberarItem(${p.id}, '${p.nome}')">Liberar</button>
+            </td>
+          </tr>
         `;
-
-        if (isReservado) {
-          containerEscolhidos.appendChild(card);
-          temEscolhido = true;
-        } else {
-          containerGeral.appendChild(card);
-        }
+        contador++;
       });
-
-      divSecaoEscolhidos.style.display = temEscolhido ? "block" : "none";
     }
 
-    async function reservarItem(idItem, nomeItem) {
-      if (!_supabase) return;
+    async function liberarItem(id, nome) {
+      if (confirm(`Tem certeza que deseja liberar o presente "${nome}"? Ele voltará para a lista pública.`)) {
+        const { error } = await _supabase
+          .from('presentes')
+          .update({ reservado: false, reservado_por: '' })
+          .eq('id', id);
 
-      const nomeConvidado = prompt(`Você escolheu: ${nomeItem}\n\nPor favor, digite o seu nome para sabermos quem enviou:`);
-      if (!nomeConvidado || nomeConvidado.trim() === "") {
-        alert("A escolha não foi concluída. É necessário informar o seu nome.");
-        return;
-      }
-
-      // Ajuste 6: Gravando booleano puro (true) no banco de dados
-      const { error } = await _supabase
-        .from('presentes')
-        .update({ reservado: true, reservado_por: nomeConvidado.trim() })
-        .eq('id', idItem);
-
-      if (error) {
-        alert("Houve um erro ao reservar. Verifique se as políticas RLS permitem gravação.");
-        console.error(error);
-      } else {
-        alert("Presente escolhido com sucesso! Muito obrigada pelo carinho. 💙✨");
-        carregarPresentes();
+        if (error) {
+          alert("Erro ao liberar item.");
+        } else {
+          carregarTabela();
+        }
       }
     }
+
+    carregarTabela();
   </script>
 </body>
 </html>
