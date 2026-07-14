@@ -8,7 +8,7 @@
   <style>
     body { font-family: Arial, sans-serif; background: #f2f7fb; margin: 0; padding: 20px; color: #2b3a4a; }
     header { background: #3a7ca5; color: white; padding: 40px 20px; text-align: center; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 4px 10px rgba(58, 124, 165, 0.15); border-bottom: 4px solid #ffd700; }
-    h1 { margin: 0; font-size: 28px; font-family: 'Georgia', serif; }
+    h1 { margin: 0; font-size: 28px; font-family: 'Georgia', serif; font-weight: bold; }
     header p { margin: 15px 0 0 0; font-size: 16px; opacity: 0.95; line-height: 1.5; }
     
     .secao-escolhidos { max-width: 1200px; margin: 0 auto 40px auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(43, 58, 74, 0.05); border: 1px solid #b0cfe0; }
@@ -36,8 +36,7 @@
 <body>
 
   <header>
-    <h1>me obedeça.</h1>
-    <p>🎩 Meus 15 Anos - Duda no País das Maravilhas 🐇</p>
+    <h1><strong>🎩 Meus 15 Anos - Duda no País das Maravilhas 🐇</strong></h1>
     <p>Oii! Que bom ter você aqui. 💖</p>
     <p>Fiz uma lista de sugestões de presentes que são a minha cara. Clique em "Escolher este🎁" para reservar um presente exclusivamente seu, e compre onde quiser. Lembrando que deixei a sugestão de loja em cada item.</p>
     <p>Ahhh, preciso te dizer que, assim que você escolher, o produto ficará indisponível para outro convidado! 🥰</p>
@@ -121,7 +120,7 @@
 
         let acaoBotao = `<button class="btn-reservar" onclick="reservarItem(${p.id}, '${p.nome}')">Escolher este🎁</button>`;
         if (isReservado) {
-          acaoBotao = `<div class="status-reservado">💙 Reservado por ${p.reservado_por || 'Convidado'}</div>`;
+          acaoBotao = `<div class="status-reservado">💙 Reservado</div>`;
         }
 
         const tagPreco = isReservado ? '' : `<div class="valor-presente">R$ ${Number(p.valor).toFixed(2).replace('.', ',')}</div>`;
