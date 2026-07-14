@@ -3,214 +3,176 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel de Controle - Lista da Duda</title>
+  <title>Meus 15 Anos - Duda</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body { font-family: Arial, sans-serif; background: #f2f7fb; margin: 0; padding: 20px; color: #2b3a4a; }
-    header { background: #1a4f70; color: white; padding: 20px; text-align: center; border-radius: 10px; margin-bottom: 30px; }
-    h1 { margin: 0; font-size: 24px; font-family: 'Georgia', serif; }
+    header { background: #3a7ca5; color: white; padding: 40px 20px; text-align: center; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 4px 10px rgba(58, 124, 165, 0.15); border-bottom: 4px solid #ffd700; }
+    h1 { margin: 0; font-size: 28px; font-family: 'Georgia', serif; }
+    header p { margin: 15px 0 0 0; font-size: 16px; opacity: 0.95; line-height: 1.5; }
     
-    .container { max-width: 1000px; margin: 0 auto; }
-    .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(43, 58, 74, 0.05); margin-bottom: 25px; border: 1px solid #e1ecf4; }
-    h2 { color: #3a7ca5; margin-top: 0; border-bottom: 2px solid #e1ecf4; padding-bottom: 10px; }
+    .secao-escolhidos { max-width: 1200px; margin: 0 auto 40px auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(43, 58, 74, 0.05); border: 1px solid #b0cfe0; }
+    .titulo-escolhidos { font-size: 18px; font-family: 'Georgia', serif; color: #3a7ca5; margin: 0 0 15px 0; text-align: left; font-weight: bold; }
     
-    /* Formulário */
-    .form-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-    @media (max-width: 600px) { .form-group { grid-template-columns: 1fr; } }
-    label { font-weight: bold; font-size: 14px; margin-bottom: 5px; display: block; }
-    input, textarea { width: 100%; padding: 10px; border: 1px solid #b0cfe0; border-radius: 5px; box-sizing: border-box; }
-    button { background: #3a7ca5; color: white; border: none; padding: 12px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
-    button:hover { background: #2a6f97; }
+    .carrossel-escolhidos { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; scroll-behavior: smooth; }
+    .carrossel-escolhidos::-webkit-scrollbar { height: 6px; }
+    .carrossel-escolhidos::-webkit-scrollbar-thumb { background: #b0cfe0; border-radius: 4px; }
     
-    /* Tabela de Monitoramento */
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e1ecf4; }
-    th { background-color: #f2f7fb; color: #3a7ca5; }
-    .btn-excluir { background: #d9534f; padding: 6px 12px; font-size: 13px; }
-    .btn-excluir:hover { background: #c9302c; }
-    .btn-liberar { background: #f0ad4e; padding: 6px 12px; font-size: 13px; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; cursor: pointer; border: none;}
-    .btn-liberar:hover { background: #ec971f; }
-    .img-preview { width: 50px; height: 50px; object-fit: contain; border-radius: 5px; }
-    .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-    .status-disponivel { background: #dff0d8; color: #3c763d; }
-    .status-reservado { background: #d9edf7; color: #31708f; }
+    .carrossel-escolhidos .card-presente { min-width: 180px; max-width: 180px; padding: 12px; }
+    .carrossel-escolhidos .card-presente img { height: 100px; margin-bottom: 8px; }
+    
+    .grid-presentes { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+    .card-presente { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(43, 58, 74, 0.05); text-align: center; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #e1ecf4; }
+    .card-presente img { max-width: 100%; height: 180px; object-fit: contain; border-radius: 5px; margin-bottom: 15px; }
+    .nome-presente { font-size: 18px; font-weight: bold; color: #2b3a4a; margin: 10px 0; }
+    .descricao-presente { font-size: 14px; color: #5a6e85; margin-bottom: 10px; line-height: 1.4; min-height: 45px; }
+    .valor-presente { font-size: 20px; color: #2a6f97; font-weight: bold; margin: 15px 0; }
+    
+    .btn-link-loja { background: #f2f7fb; color: #3a7ca5; border: 1px solid #b0cfe0; padding: 8px; width: 100%; border-radius: 5px; font-size: 13px; text-decoration: none; display: inline-block; margin-bottom: 10px; box-sizing: border-box; }
+    .btn-reservar { background: #3a7ca5; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 15px; }
+    .status-reservado { color: #5a6e85; font-weight: bold; padding: 12px; background: #e1ecf4; border-radius: 5px; margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 5px; }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>🔑 Painel de Controle da Duda e da Mamãe 👑</h1>
-    <p>Gerencie os presentes e monitore quem já escolheu!</p>
+    <h1>🎩 Meus 15 Anos - Duda no País das Maravilhas 🐇</h1>
+    <p>Oii! Que bom ter você aqui. 💖</p>
+    <p>Fiz uma lista de sugestões de presentes que são a minha cara. Clique em "Escolher 🎁" para reservar um presente exclusivamente seu, e compre onde quiser. Lembrando que deixei a sugestão de loja em cada item.</p>
+    <p>Ahhh, preciso te dizer que, assim que você escolher, o produto ficará indisponível para outro convidado! 🥰</p>
   </header>
 
-  <div class="container">
-    
-    <div class="card">
-      <h2>🎁 Adicionar Novo Presente à Lista</h2>
-      <form id="formAdicionar" onsubmit="adicionarPresente(event)">
-        <div class="form-group">
-          <div>
-            <label>Nome do Presente *</label>
-            <input type="text" id="nome" required placeholder="Ex: Livro Alice no País das Maravilhas">
-          </div>
-          <div>
-            <label>Valor (R$) *</label>
-            <input type="number" step="0.01" id="valor" required placeholder="Ex: 59.90">
-          </div>
-        </div>
-        <div class="form-group">
-          <div>
-            <label>Link da Imagem (URL)</label>
-            <input type="url" id="imagem" placeholder="https://exemplo.com/foto.jpg">
-          </div>
-          <div>
-            <label>Link de Sugestão de Loja (Cole dentro da Descrição se houver)</label>
-            <input type="url" id="linkLoja" placeholder="https://amazon.com.br/item">
-          </div>
-        </div>
-        <div style="margin-bottom: 15px;">
-          <label>Descrição do Presente</label>
-          <textarea id="descricao" rows="2" placeholder="Algum detalhe extra, tamanho, cor, etc."></textarea>
-        </div>
-        <button type="submit">Cadastrar Presente ✨</button>
-      </form>
-    </div>
+  <div class="secao-escolhidos" id="secaoEscolhidos" style="display: none;">
+    <div class="titulo-escolhidos">✨ Presentes Já Escolhidos (Não perca a hora!) ⏰</div>
+    <div class="carrossel-escolhidos" id="listaEscolhidos"></div>
+  </div>
 
-    <div class="card">
-      <h2>📊 Lista de Presentes & Monitoramento de Reservas</h2>
-      <div style="overflow-x: auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>Foto</th>
-              <th>Presente</th>
-              <th>Valor</th>
-              <th>Status</th>
-              <th>Quem Escolheu?</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="tabelaPresentes">
-            <tr>
-              <td colspan="6" style="text-align: center;">Carregando presentes...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
+  <div class="grid-presentes" id="listaProdutos">
+    <p style="text-align: center; grid-column: 1/-1;">Carregando a lista de presentes...</p>
   </div>
 
   <script>
-    // Conexão direta com o Supabase da Duda
+    // 1. URL CORRIGIDA COM .supabase.co
     const SUPABASE_URL = "https://pfagquntwcfwjblezjro.supabase.co";
     const SUPABASE_KEY = "sb_publishable_Rkm1UZv7J13m8kVhcvrIpA_IP_wl7zu"; 
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-      global: { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+    let _supabase;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (typeof supabase !== "undefined") {
+        _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        carregarPresentes();
+      } else {
+        document.getElementById("listaProdutos").innerHTML = "<p style='color:red;'>Erro ao carregar a biblioteca de conexão.</p>";
+      }
     });
 
-    async function carregarTabela() {
+    function separarTextoELink(textoCompleto) {
+      if (!textoCompleto) return { texto: "", link: "" };
+      const regexLink = /(https?:\/\/[^\s]+)/g;
+      const linksEncontrados = textoCompleto.match(regexLink);
+      if (linksEncontrados && linksEncontrados.length > 0) {
+        const linkExtraido = linksEncontrados[0];
+        const textoLimpo = textoCompleto.replace(linkExtraido, "").trim();
+        return { texto: textoLimpo, link: linkExtraido };
+      }
+      return { texto: textoCompleto, link: "" };
+    }
+
+    async function carregarPresentes() {
+      if (!_supabase) return;
+      
       const { data: produtos, error } = await _supabase
         .from('presentes')
         .select('*')
-        .order('nome', { ascending: true });
+        .order('id', { ascending: true }); // Ordenando por ID para respeitar a ordem de cadastro
 
       if (error) {
-        console.error("Erro ao carregar:", error);
+        console.error("Erro Supabase:", error);
+        document.getElementById("listaProdutos").innerHTML = `<p style='color:red;'>Erro ao carregar banco: ${error.message}</p>`;
         return;
       }
 
-      const tbody = document.getElementById("tabelaPresentes");
-      tbody.innerHTML = "";
+      const containerGeral = document.getElementById("listaProdutos");
+      const containerEscolhidos = document.getElementById("listaEscolhidos");
+      const divSecaoEscolhidos = document.getElementById("secaoEscolhidos");
+      
+      containerGeral.innerHTML = "";
+      containerEscolhidos.innerHTML = "";
+      let temEscolhido = false;
 
-      if (produtos.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Nenhum presente cadastrado ainda.</td></tr>`;
+      if (!produtos || produtos.length === 0) {
+        containerGeral.innerHTML = "<p>Nenhum presente disponível no momento.</p>";
         return;
       }
 
       produtos.forEach(p => {
-        const isReservado = p.reservado === true || p.reservado === 'TRUE' || p.reservado_por;
-        const statusHTML = isReservado 
-          ? `<span class="status-badge status-reservado">💙 Reservado</span>` 
-          : `<span class="status-badge status-disponivel">💚 Disponível</span>`;
+        const card = document.createElement("div");
+        card.className = "card-presente";
 
-        const btnAcao = isReservado
-          ? `<button class="btn-liberar" onclick="liberarItem(${p.id}, '${p.nome}')">Liberar Presente</button>`
-          : `<button class="btn-excluir" onclick="excluirItem(${p.id}, '${p.nome}')">Excluir</button>`;
+        // Ajuste 6: Tratamento de booleano puro ou string vinda do banco
+        const isReservado = p.reservado === true || p.reservado === 'TRUE' || p.reservado === 'true' || !!p.reservado_por;
+        
+        // Ajuste 5: Mapeamento de caractere especial 'descrição'
+        const textoDescricaoRaw = p.descrição || p.descricao || p['descri\u00e7\u00e3o'] || '';
+        const dadosDescricao = separarTextoELink(textoDescricaoRaw);
 
-        tbody.innerHTML += `
-          <tr>
-            <td><img class="img-preview" src="${p.imagem || 'https://via.placeholder.com/50'}" alt="${p.nome}"></td>
-            <td><strong>${p.nome}</strong></td>
-            <td>R$ ${Number(p.valor).toFixed(2).replace('.', ',')}</td>
-            <td>${statusHTML}</td>
-            <td><strong>${p.reservado_por || '-'}</strong></td>
-            <td>
-              ${btnAcao}
-            </td>
-          </tr>
+        let botaoLinkLoja = "";
+        if (dadosDescricao.link) {
+          botaoLinkLoja = `<a href="${dadosDescricao.link}" target="_blank" class="btn-link-loja">🔗 Ver Sugestão de Loja</a>`;
+        }
+
+        let acaoBotao = `<button class="btn-reservar" onclick="reservarItem(${p.id}, '${p.nome}')">Escolher Presente 🎁</button>`;
+        if (isReservado) {
+          acaoBotao = `<div class="status-reservado">💙 Reservado por ${p.reservado_por || 'Convidado'}</div>`;
+        }
+
+        const tagPreco = isReservado ? '' : `<div class="valor-presente">R$ ${Number(p.valor).toFixed(2).replace('.', ',')}</div>`;
+
+        card.innerHTML = `
+          <div>
+            <img src="${p.imagem || 'https://via.placeholder.com/150'}" alt="${p.nome}">
+            <div class="nome-presente">${p.nome}</div>
+            ${dadosDescricao.texto ? `<div class="descricao-presente">${dadosDescricao.texto}</div>` : ''}
+            ${botaoLinkLoja}
+            ${tagPreco}
+          </div>
+          ${acaoBotao}
         `;
+
+        if (isReservado) {
+          containerEscolhidos.appendChild(card);
+          temEscolhido = true;
+        } else {
+          containerGeral.appendChild(card);
+        }
       });
+
+      divSecaoEscolhidos.style.display = temEscolhido ? "block" : "none";
     }
 
-    async function adicionarPresente(e) {
-      e.preventDefault();
-      const nome = document.getElementById("nome").value;
-      const valor = parseFloat(document.getElementById("valor").value);
-      const imagem = document.getElementById("imagem").value || 'https://via.placeholder.com/150';
-      const linkLoja = document.getElementById("linkLoja").value;
-      let descricao = document.getElementById("descricao").value;
+    async function reservarItem(idItem, nomeItem) {
+      if (!_supabase) return;
 
-      // Junta o link da loja na descrição caso exista, para o site principal ler certinho
-      if (linkLoja) {
-        descricao = `${descricao} ${linkLoja}`.trim();
+      const nomeConvidado = prompt(`Você escolheu: ${nomeItem}\n\nPor favor, digite o seu nome para sabermos quem enviou:`);
+      if (!nomeConvidado || nomeConvidado.trim() === "") {
+        alert("A escolha não foi concluída. É necessário informar o seu nome.");
+        return;
       }
 
+      // Ajuste 6: Gravando booleano puro (true) no banco de dados
       const { error } = await _supabase
         .from('presentes')
-        .insert([{ nome, valor, imagem, descrição: descricao, reservado: 'FALSE', reservado_por: '' }]);
+        .update({ reservado: true, reservado_por: nomeConvidado.trim() })
+        .eq('id', idItem);
 
       if (error) {
-        alert("Erro ao adicionar o presente.");
+        alert("Houve um erro ao reservar. Verifique se as políticas RLS permitem gravação.");
         console.error(error);
       } else {
-        alert("Presente adicionado com sucesso!");
-        document.getElementById("formAdicionar").reset();
-        carregarTabela();
+        alert("Presente escolhido com sucesso! Muito obrigada pelo carinho. 💙✨");
+        carregarPresentes();
       }
     }
-
-    async function liberarItem(id, nome) {
-      if (confirm(`Tem certeza que quer liberar o presente "${nome}"? Ele voltará a ficar disponível para todos.`)) {
-        const { error } = await _supabase
-          .from('presentes')
-          .update({ reservado: 'FALSE', reservado_por: '' })
-          .eq('id', id);
-
-        if (error) {
-          alert("Erro ao liberar item.");
-        } else {
-          carregarTabela();
-        }
-      }
-    }
-
-    async function excluirItem(id, nome) {
-      if (confirm(`Tem certeza que deseja apagar permanentemente o presente "${nome}" do site?`)) {
-        const { error } = await _supabase
-          .from('presentes')
-          .delete()
-          .eq('id', id);
-
-        if (error) {
-          alert("Erro ao excluir item.");
-        } else {
-          carregarTabela();
-        }
-      }
-    }
-
-    carregarTabela();
   </script>
 </body>
 </html>
